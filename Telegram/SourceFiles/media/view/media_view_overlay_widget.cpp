@@ -123,9 +123,9 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 
 #include <QGraphicsOpacityEffect>
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
 #include "platform/mac/touchbar/mac_touchbar_media_view.h"
-#endif // Q_OS_MAC
+#endif // Q_OS_MACOS
 
 #include <QtWidgets/QApplication>
 #include <QtCore/QBuffer>
@@ -954,7 +954,7 @@ OverlayWidget::OverlayWidget()
 	updateGeometry();
 	updateControlsGeometry();
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
 	TouchBar::SetupMediaViewTouchBar(
 		_window->winId(),
 		tr::lng_mediaview_title(tr::now),
@@ -962,7 +962,7 @@ OverlayWidget::OverlayWidget()
 		_touchbarTrackState.events(),
 		_touchbarDisplay.events(),
 		_touchbarFullscreenToggled.events());
-#endif // Q_OS_MAC
+#endif // Q_OS_MACOS
 
 	using namespace rpl::mappers;
 	rpl::combine(
