@@ -67,6 +67,15 @@ inline auto LanguageFromLocale(QLocale loc) {
 			: int(locLang);
 }
 
+// Unlike the manifest, keeps the country of any language
+[[nodiscard]] int SystemDictionaryId(const QString &name) {
+	const auto locale = QLocale(name);
+	const auto language = locale.language();
+	return (locale.territory() == QLocale(language).territory())
+		? int(language)
+		: LWC(language, locale.territory());
+}
+
 constexpr auto kDictionariesManifestChannel = "tdhbcfiles"_cs;
 constexpr auto kDictionariesManifestPostId = 2949;
 constexpr auto kDictionariesRev = 2;
@@ -304,7 +313,8 @@ void DownloadDictionaryInBackground(
 
 		DownloadDictionaryInBackground(session, counter, langs, done, force);
 	};
-	if (DictionaryExists(id) && !(force && IsSupportedLang(id))) {
+	if (DictionaryExists(id)
+		&& !(force && IsSupportedLang(id) && !IsSystemDictionary(id))) {
 		destroyer();
 		return;
 	}
@@ -447,6 +457,7 @@ void ForceRefreshDictionaries(
 			// so they don't hold the one-time revision back.
 			const auto complete = ranges::all_of(list, [](int id) {
 				return !IsSupportedLang(id)
+					|| IsSystemDictionary(id)
 					|| ranges::all_of(kDictExtensions, [&](const auto ext) {
 						const auto name = Spellchecker::LocaleFromLangId(id)
 							.name();
@@ -588,7 +599,7 @@ bool UnpackDictionary(const QString &path, int langId) {
 	return true;
 }
 
-bool DictionaryExists(int langId) {
+bool DictionaryDownloaded(int langId) {
 	if (!langId) {
 		return true;
 	}
@@ -597,6 +608,17 @@ bool DictionaryExists(int langId) {
 		const auto name = Spellchecker::LocaleFromLangId(langId).name();
 		return !QFile(folder + name + '.' + ext).exists();
 	});
+}
+
+bool IsSystemDictionary(int langId) {
+	return ranges::contains(
+		SystemDictionaries(),
+		langId,
+		SystemDictionaryId);
+}
+
+bool DictionaryExists(int langId) {
+	return DictionaryDownloaded(langId) || IsSystemDictionary(langId);
 }
 
 bool RemoveDictionary(int langId) {
@@ -611,7 +633,7 @@ bool RemoveDictionary(int langId) {
 		return false;
 	}
 	RemoveDictionaryFiles(folder);
-	return !DictionaryExists(langId);
+	return !DictionaryDownloaded(langId);
 }
 
 rpl::producer<QString> ButtonManageDictsState(
@@ -643,6 +665,7 @@ rpl::producer<QString> ButtonManageDictsState(
 		rpl::merge(
 			Spellchecker::SupportedScriptsChanged(),
 			Spellchecker::DictionariesChanged(),
+			Spellchecker::SystemDictionariesChanged(),
 			Core::App().settings().dictionariesEnabledChanges(
 			) | rpl::to_empty,
 			Core::App().settings().spellcheckerEnabledChanges(
