@@ -59,14 +59,6 @@ inline auto LWC(QLocale::Language language, QLocale::Country country) {
 	return (language * 1000) + country;
 }
 
-inline auto LanguageFromLocale(QLocale loc) {
-	const auto locLang = loc.language();
-	return (ranges::contains(kLangsForLWC, locLang)
-		&& (loc.country() != QLocale::AnyCountry))
-			? LWC(locLang, loc.country())
-			: int(locLang);
-}
-
 // Unlike the manifest, keeps the country of any language
 [[nodiscard]] int SystemDictionaryId(const QString &name) {
 	const auto locale = QLocale(name);
@@ -74,6 +66,18 @@ inline auto LanguageFromLocale(QLocale loc) {
 	return (locale.territory() == QLocale(language).territory())
 		? int(language)
 		: LWC(language, locale.territory());
+}
+
+inline auto LanguageFromLocale(QLocale loc) {
+	if (const auto exact = SystemDictionaryId(loc.name())
+		; IsSystemDictionary(exact)) {
+		return exact;
+	}
+	const auto locLang = loc.language();
+	return (ranges::contains(kLangsForLWC, locLang)
+		&& (loc.country() != QLocale::AnyCountry))
+			? LWC(locLang, loc.country())
+			: int(locLang);
 }
 
 [[nodiscard]] QString SystemDictionaryName(const QLocale &locale) {
@@ -703,7 +707,8 @@ std::vector<int> DefaultLanguages() {
 
 	const auto append = [&](const auto loc) {
 		const auto l = LanguageFromLocale(loc);
-		if (!ranges::contains(langs, l) && IsSupportedLang(l)) {
+		if (!ranges::contains(langs, l)
+			&& (IsSupportedLang(l) || IsSystemDictionary(l))) {
 			langs.push_back(l);
 		}
 	};
