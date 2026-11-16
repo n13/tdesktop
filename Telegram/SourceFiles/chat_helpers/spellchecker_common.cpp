@@ -76,6 +76,19 @@ inline auto LanguageFromLocale(QLocale loc) {
 		: LWC(language, locale.territory());
 }
 
+[[nodiscard]] QString SystemDictionaryName(const QLocale &locale) {
+	auto result = locale.nativeLanguageName();
+	if (result.isEmpty()) {
+		result = QLocale::languageToString(locale.language());
+	}
+	result[0] = result[0].toUpper();
+	return (locale.territory() == QLocale(locale.language()).territory())
+		? result
+		: u"%1 (%2)"_q.arg(
+			result,
+			QLocale::territoryToString(locale.territory()));
+}
+
 constexpr auto kDictionariesManifestChannel = "tdhbcfiles"_cs;
 constexpr auto kDictionariesManifestPostId = 2949;
 constexpr auto kDictionariesRev = 2;
@@ -544,6 +557,17 @@ std::vector<Dict> Dictionaries() {
 
 rpl::producer<> DictionariesChanged() {
 	return DictionariesListChanged.events();
+}
+
+std::vector<Dict> DictionariesFromSystem() {
+	auto result = std::vector<Dict>();
+	for (const auto &name : SystemDictionaries()) {
+		auto dict = Dict();
+		dict.id = SystemDictionaryId(name);
+		dict.name = SystemDictionaryName(QLocale(name));
+		result.push_back(std::move(dict));
+	}
+	return result;
 }
 
 void RefreshDictionariesManifest(not_null<Main::Session*> session) {
