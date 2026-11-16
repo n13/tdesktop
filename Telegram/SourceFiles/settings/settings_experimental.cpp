@@ -32,6 +32,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "core/application.h"
 #include "core/launcher.h"
 #include "core/sandbox.h"
+#include "data/data_peer_suspicious_name.h"
 #include "chat_helpers/tabbed_panel.h"
 #include "dialogs/dialogs_entry.h"
 #include "dialogs/dialogs_widget.h"
@@ -448,6 +449,7 @@ void SetupExperimental(
 				kOptionUseNewChatView,
 				kOptionAutoScrollInactiveChat,
 				kModerateCommonGroups,
+				Data::kOptionFlagSuspiciousNames,
 				Info::kClassicProfileScroll,
 			}
 		},

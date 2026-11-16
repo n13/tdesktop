@@ -75,6 +75,7 @@ include(cmake/test_iv_editor_state.cmake)
 include(cmake/test_iv_editor_table_grid.cmake)
 include(cmake/test_wallet_card_tint.cmake)
 include(cmake/test_wallet_phrase_shares.cmake)
+include(cmake/test_suspicious_names.cmake)
 
 set_target_properties(Telegram PROPERTIES AUTOMOC ON)
 
@@ -790,6 +791,8 @@ PRIVATE
     data/data_peer_id.cpp
     data/data_peer_id.h
     data/data_peer_share_theme.h
+    data/data_peer_suspicious_name.cpp
+    data/data_peer_suspicious_name.h
     data/data_peer_values.cpp
     data/data_peer_values.h
     data/data_photo.cpp

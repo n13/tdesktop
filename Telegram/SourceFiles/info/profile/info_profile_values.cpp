@@ -720,12 +720,18 @@ rpl::producer<BadgeType> BadgeValueFromFlags(Peer peer) {
 		Data::PeerFlagsValue(
 			peer,
 			Flag::Verified | Flag::Scam | Flag::Fake),
-		Data::PeerPremiumValue(peer)
-	) | rpl::map([=](base::flags<Flag> value, bool premium) {
+		Data::PeerPremiumValue(peer),
+		peer->session().changes().peerFlagsValue(peer, UpdateFlag::Name)
+	) | rpl::map([=](
+			base::flags<Flag> value,
+			bool premium,
+			const Data::PeerUpdate &) {
 		return (value & Flag::Scam)
 			? BadgeType::Scam
 			: (value & Flag::Fake)
 			? BadgeType::Fake
+			: peer->hasSuspiciousName()
+			? BadgeType::Suspicious
 			: peer->isMonoforum()
 			? BadgeType::Direct
 			: (value & Flag::Verified)

@@ -273,6 +273,7 @@ public:
 	[[nodiscard]] bool isPremium() const;
 	[[nodiscard]] bool isScam() const;
 	[[nodiscard]] bool isFake() const;
+	[[nodiscard]] bool hasSuspiciousName() const;
 	[[nodiscard]] bool isMegagroup() const;
 	[[nodiscard]] bool isBroadcast() const;
 	[[nodiscard]] bool isForum() const;
@@ -653,6 +654,7 @@ private:
 	uint32 _sensitiveContent : 1 = 0;
 	uint32 _wallPaperOverriden : 1 = 0;
 	uint32 _checkedTrustedPayForMessage : 1 = 0;
+	uint32 _suspiciousName : 1 = 0;
 
 	TimeId _ttlPeriod = 0;
 
