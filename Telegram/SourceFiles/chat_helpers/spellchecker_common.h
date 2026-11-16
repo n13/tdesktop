@@ -36,6 +36,7 @@ bool RemoveDictionary(int langId);
 
 std::vector<Dict> Dictionaries();
 rpl::producer<> DictionariesChanged();
+[[nodiscard]] std::vector<Dict> DictionariesFromSystem();
 void RefreshDictionariesManifest(not_null<Main::Session*> session);
 
 void Start(not_null<Main::Session*> session);
