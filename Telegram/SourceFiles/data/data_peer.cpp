@@ -24,6 +24,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_file_origin.h"
 #include "data/data_histories.h"
 #include "data/data_cloud_themes.h"
+#include "data/data_peer_suspicious_name.h"
 #include "base/unixtime.h"
 #include "base/crc32hash.h"
 #include "lang/lang_keys.h"
@@ -42,6 +43,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "window/main_window.h" // Window::LogoNoMargin.
 #include "ui/image/image.h"
 #include "ui/chat/chat_style.h"
+#include "ui/emoji_config.h"
 #include "ui/empty_userpic.h"
 #include "ui/text/text_options.h"
 #include "ui/painter.h"
@@ -87,6 +89,11 @@ using UpdateFlag = Data::PeerUpdate::Flag;
 [[nodiscard]] int RegistrationMonth(int date) {
 	const auto month = date % 100;
 	return (month > 0 && month <= 12) ? month : 0;
+}
+
+[[nodiscard]] bool IsEmoji(QStringView text) {
+	auto length = 0;
+	return Ui::Emoji::Find(text, &length) && (length == text.size());
 }
 
 } // namespace
@@ -324,6 +331,8 @@ void PeerData::updateNameDelayed(
 		}
 	}
 	_name = newName;
+	_suspiciousName = Data::FlagSuspiciousNames()
+		&& !Data::SuspiciousNameCharacters(newName, IsEmoji).empty();
 	invalidateEmptyUserpic();
 
 	auto flags = UpdateFlag::None | UpdateFlag::None;
@@ -1558,6 +1567,10 @@ bool PeerData::isFake() const {
 		return channel->isFake();
 	}
 	return false;
+}
+
+bool PeerData::hasSuspiciousName() const {
+	return _suspiciousName && !isSelf();
 }
 
 bool PeerData::isMegagroup() const {

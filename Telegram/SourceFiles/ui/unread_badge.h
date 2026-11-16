@@ -110,6 +110,7 @@ private:
 enum class TextBadgeType : uchar {
 	Scam,
 	Fake,
+	Suspicious,
 	Direct,
 };
 

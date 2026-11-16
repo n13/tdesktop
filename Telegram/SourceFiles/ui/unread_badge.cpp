@@ -176,6 +176,7 @@ void UnreadBadge::paintEvent(QPaintEvent *e) {
 QString TextBadgeText(TextBadgeType type) {
 	switch (type) {
 	case TextBadgeType::Fake: return tr::lng_fake_badge(tr::now);
+	case TextBadgeType::Suspicious: return tr::lng_suspicious_badge(tr::now);
 	case TextBadgeType::Scam: return tr::lng_scam_badge(tr::now);
 	case TextBadgeType::Direct: return tr::lng_direct_badge(tr::now);
 	}
@@ -251,7 +252,10 @@ int PeerBadge::drawGetWidth(Painter &p, Descriptor &&descriptor) {
 	Expects(descriptor.customEmojiRepaint != nullptr);
 
 	const auto peer = descriptor.peer;
-	if ((descriptor.scam && (peer->isScam() || peer->isFake()))
+	if ((descriptor.scam
+			&& (peer->isScam()
+				|| peer->isFake()
+				|| peer->hasSuspiciousName()))
 		|| (descriptor.direct && peer->isMonoforum())) {
 		if (_emojiStatus) {
 			_emojiStatus->painted = false;
@@ -308,6 +312,8 @@ int PeerBadge::drawTextBadge(Painter &p, const Descriptor &descriptor) {
 			return TextBadgeType::Scam;
 		} else if (descriptor.peer->isFake()) {
 			return TextBadgeType::Fake;
+		} else if (descriptor.peer->hasSuspiciousName()) {
+			return TextBadgeType::Suspicious;
 		}
 		return TextBadgeType::Direct;
 	}();

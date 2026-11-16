@@ -97,6 +97,8 @@ void Badge::setContent(Content content) {
 			return tr::lng_scam_badge(tr::now);
 		case BadgeType::Fake:
 			return tr::lng_fake_badge(tr::now);
+		case BadgeType::Suspicious:
+			return tr::lng_suspicious_badge(tr::now);
 		case BadgeType::Direct:
 			return tr::lng_direct_badge(tr::now);
 		}
@@ -182,11 +184,14 @@ void Badge::setContent(Content content) {
 	} break;
 	case BadgeType::Scam:
 	case BadgeType::Fake:
+	case BadgeType::Suspicious:
 	case BadgeType::Direct: {
 		const auto type = (_content.badge == BadgeType::Direct)
 			? Ui::TextBadgeType::Direct
 			: (_content.badge == BadgeType::Fake)
 			? Ui::TextBadgeType::Fake
+			: (_content.badge == BadgeType::Suspicious)
+			? Ui::TextBadgeType::Suspicious
 			: Ui::TextBadgeType::Scam;
 		const auto size = Ui::TextBadgeSize(type);
 		const auto skip = st::infoVerifiedCheckPosition.x();
