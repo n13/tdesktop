@@ -28,6 +28,8 @@ MTP::DedicatedLoader::Location GetDownloadLocation(int id);
 [[nodiscard]] QString DictionariesPath();
 [[nodiscard]] QString DictPathByLangId(int langId);
 bool UnpackDictionary(const QString &path, int langId);
+[[nodiscard]] bool DictionaryDownloaded(int langId);
+[[nodiscard]] bool IsSystemDictionary(int langId);
 [[nodiscard]] bool DictionaryExists(int langId);
 bool RemoveDictionary(int langId);
 [[nodiscard]] bool IsEn(int langId);

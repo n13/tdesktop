@@ -305,7 +305,7 @@ auto AddButtonWithLoader(
 	const auto contextMenu = button->lifetime()
 		.make_state<base::unique_qptr<Ui::PopupMenu>>();
 	const auto showMenu = [=] {
-		if (!DictExists(id)) {
+		if (!Spellchecker::DictionaryDownloaded(id)) {
 			return false;
 		}
 		*contextMenu = base::make_unique_q<Ui::PopupMenu>(
